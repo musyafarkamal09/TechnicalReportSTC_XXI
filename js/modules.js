@@ -1,0 +1,21 @@
+export const ST=null;
+export const NAV=[['dashboard','Dashboard'],['announcements','Pengumuman'],['ats_tickets','Tiket ATS'],['work_reports','Laporan Pekerjaan'],['purchases','Pembelian Barang'],['water','Meteran Air'],['electric','Meteran Listrik'],['history','Riwayat Laporan'],['monthly','Laporan Bulanan',1],['yearly','Laporan Tahunan',1],['account','Pengaturan Akun']];
+const now=()=>new Date().toLocaleString('sv-SE',{timeZone:'Asia/Jakarta'}).slice(0,16).replace(' ','T');
+const meter=(kind,label,unit)=>({label,table:'meter_readings',fixed:{kind},no:'reading_no',name:'officer',d:'read_at',dt:1,sum:'usage',unit,
+ cols:['reading_no','read_at','prev_value','curr_value','usage','officer'],lab:{reading_no:'No',read_at:'Waktu',prev_value:'Sebelumnya',curr_value:'Saat ini',usage:'Pemakaian '+unit,officer:'Petugas'},
+ f:[['read_at','Tanggal & jam','datetime-local'],['prev_value','Angka sebelumnya','number'],['curr_value','Angka saat ini','number'],['is_reset','Reset / ganti meter','checkbox'],['officer','Nama petugas','text'],['notes','Catatan','textarea']],
+ opt:['notes'],slots:[['doc','Foto dokumentasi']],def:(me,p)=>({read_at:now(),prev_value:p,officer:me.full_name})});
+export const MODS={
+ announcements:{label:'Pengumuman',table:'announcements',adminOnly:true,no:'title',name:'title',d:'published_at',dt:1,cols:['title','published_at','status'],lab:{title:'Judul',published_at:'Publikasi',status:'Status'},
+  f:[['title','Judul','text'],['body','Isi','textarea'],['published_at','Tanggal & jam publikasi','datetime-local'],['status','Status','select',['Aktif','Arsip']]],def:()=>({published_at:now()})},
+ ats_tickets:{label:'Tiket ATS',table:'ats_tickets',adminOnly:true,no:'ticket_no',name:'title',d:'ticket_at',dt:1,cols:['ticket_no','title','location','ticket_at','status'],lab:{ticket_no:'No Tiket',title:'Judul',location:'Lokasi',ticket_at:'Waktu',status:'Status'},
+  f:[['title','Judul','text'],['description','Deskripsi masalah','textarea'],['location','Lokasi / perangkat','text'],['ticket_at','Tanggal & jam','datetime-local'],['status','Status','select',['Open','In Progress','Pending','Resolved','Closed','Arsip']],['notes','Catatan','textarea']],opt:['notes'],def:()=>({ticket_at:now()})},
+ work_reports:{label:'Laporan Pekerjaan',table:'work_reports',no:'report_no',name:'title',d:'work_date',sum:null,cols:['report_no','work_date','title','category','reporter','status'],lab:{report_no:'No',work_date:'Tanggal',title:'Judul',category:'Kategori',reporter:'Pelapor',status:'Status'},
+  f:[['title','Judul','text'],['category','Kategori','select',['Elektrikal','Mekanikal','Proyektor/Cinema','Jaringan/IT','Kebersihan','Lainnya']],['location','Lokasi','text'],['description','Deskripsi pekerjaan','textarea'],['reporter','Nama pelapor','text'],
+   ['work_date','Tanggal pekerjaan','date'],['start_time','Jam mulai','time'],['end_time','Jam selesai','time'],['status','Status','select',['Belum Dikerjakan','Sedang Dikerjakan','Menunggu','Selesai','Dibatalkan']],['notes','Catatan tambahan','textarea']],
+  opt:['notes','end_time'],slots:[['before','BEFORE (sebelum)'],['after','AFTER (sesudah)']],def:me=>({reporter:me.full_name,work_date:now().slice(0,10),start_time:'08:00'})},
+ purchases:{label:'Pembelian Barang',table:'purchases',no:'purchase_no',name:'item_name',d:'purchased_at',dt:1,sum:'total',userNoStatus:1,cols:['purchase_no','purchased_at','item_name','qty','total','buyer','status'],lab:{purchase_no:'No',purchased_at:'Waktu',item_name:'Barang',qty:'Jml',total:'Total (Rp)',buyer:'Pembeli',status:'Status'},
+  f:[['purchased_at','Tanggal & jam','datetime-local'],['item_name','Nama barang','text'],['category','Kategori','select',['Peralatan Teknis','Peralatan Listrik','Peralatan Mekanikal','Kebersihan','Suku Cadang','Perlengkapan Kerja','Lainnya']],
+   ['qty','Jumlah','number'],['unit','Satuan','text'],['unit_price','Harga satuan (Rp)','number'],['store','Toko / pemasok','text'],['buyer','Nama pembeli','text'],['purpose','Keperluan','text'],['status','Status','select',['Menunggu Verifikasi','Disetujui','Ditolak']],['notes','Catatan','textarea']],
+  opt:['notes'],slots:[['proof','Foto bukti (struk/nota/barang)']],def:me=>({purchased_at:now(),buyer:me.full_name})},
+ water:meter('water','Meteran Air','m³'), electric:meter('electric','Meteran Listrik','kWh')};
